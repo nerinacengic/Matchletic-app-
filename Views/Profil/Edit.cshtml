@@ -1,0 +1,119 @@
+﻿@model Matchletic.Models.Korisnik
+@{
+    ViewData["Title"] = "Uredi profil";
+    var sportovi = ViewBag.Sportovi as MultiSelectList;
+}
+
+<div class="bg-white rounded-xl shadow-sm p-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">@ViewData["Title"]</h1>
+
+    <form asp-controller="Profil" asp-action="Edit" asp-route-id="@Model.KorisnikID" method="post" enctype="multipart/form-data" class="space-y-6">
+        <div asp-validation-summary="ModelOnly" class="text-red-500" role="alert"></div>
+        <input type="hidden" asp-for="KorisnikID" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label asp-for="Ime" class="block text-sm font-medium text-gray-700 mb-1">Ime</label>
+                <input asp-for="Ime" class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+                <span asp-validation-for="Ime" class="text-red-500 text-sm"></span>
+            </div>
+
+            <div>
+                <label asp-for="Prezime" class="block text-sm font-medium text-gray-700 mb-1">Prezime</label>
+                <input asp-for="Prezime" class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+                <span asp-validation-for="Prezime" class="text-red-500 text-sm"></span>
+            </div>
+        </div>
+
+        <div>
+            <label asp-for="Email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input asp-for="Email" class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+            <span asp-validation-for="Email" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label asp-for="Lokacija" class="block text-sm font-medium text-gray-700 mb-1">Lokacija</label>
+            <input asp-for="Lokacija" class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+            <span asp-validation-for="Lokacija" class="text-red-500 text-sm"></span>
+        </div>
+
+        <div>
+            <label for="profilnaSlika" class="block text-sm font-medium text-gray-700 mb-1">Profilna slika</label>
+            <div class="flex items-center space-x-4">
+                @if (!string.IsNullOrEmpty(Model.ProfilnaSlika))
+                {
+                    <img src="@Model.ProfilnaSlika" alt="Profilna slika" class="h-16 w-16 rounded-full object-cover" />
+                }
+                else
+                {
+                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                        <i data-feather="user" class="text-gray-500" width="24" height="24"></i>
+                    </div>
+                }
+                <div class="flex-1">
+                    <input type="file" name="profilnaSlika" id="profilnaSlika" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-500 hover:file:bg-red-100" accept="image/*" />
+                    <p class="mt-1 text-sm text-gray-500">Preporučena veličina: 200x200 piksela</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <label for="odabraniSportovi" class="block text-sm font-medium text-gray-700">Sportovi kojima se bavite</label>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    @foreach (var item in sportovi)
+                    {
+                        <div class="flex items-center">
+                            <input type="checkbox"
+                                   name="odabraniSportovi"
+                                   id="sport-@item.Value"
+                                   value="@item.Value"
+                            @(item.Selected ? "checked" : "")
+                                   class="h-4 w-4 text-red-500 focus:ring-red-400 border-gray-300 rounded" />
+                            <label for="sport-@item.Value" class="ml-2 block text-sm text-gray-700">@item.Text</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <p class="mt-1 text-sm text-gray-500">Označite sportove kojima se bavite</p>
+        </div>
+
+        <div class="flex space-x-3 pt-4">
+            <a asp-controller="Profil" asp-action="Index" class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-5 py-2 rounded-full transition-colors text-center w-full">
+                Odustani
+            </a>
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-full transition-colors w-full font-semibold shadow-md">
+                Spremi promjene
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+
+            // Dodajmo praćenje slanja forme
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                console.log('Form submitted');
+
+                // Provjerimo checkboxove za sportove
+                const sportCheckboxes = document.querySelectorAll('input[name="odabraniSportovi"]:checked');
+                console.log(`Selected sports: ${sportCheckboxes.length}`);
+
+                sportCheckboxes.forEach(function(checkbox) {
+                    console.log(`Sport ID: ${checkbox.value}`);
+                });
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
